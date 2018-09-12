@@ -92,6 +92,9 @@ def setup():
 
 	plt.show()
 
+def q2():
+
+
 def q3():
 	fig = plt.figure()
 
@@ -116,13 +119,12 @@ def q3():
 	#render the Oxyz
 	ax.quiver(*origin, X, Y, Z, label='rotation')
 
-	#render Ox'y'z'
+	#Calculate the components of Ox'y'z'
 	X = np.dot(np.dot(Ry(np.pi / 2), np.dot(Rz(-1 * np.pi / 6), np.dot(Py(), Rx((np.pi * gln / 4))))), X)
 	Y = np.dot(np.dot(Ry(np.pi / 2), np.dot(Rz(-1 * np.pi / 6), np.dot(Py(), Rx((np.pi * gln / 4))))), Y)
 	Z = np.dot(np.dot(Ry(np.pi / 2), np.dot(Rz(-1 * np.pi / 6), np.dot(Py(), Rx((np.pi * gln / 4))))), Z)
 
-	#print((X,Y,Z))
-
+	#Render the transformation
 	ax.quiver(*origin, X, Y, Z, label='rotation', color='black')
 
 	plt.show()
