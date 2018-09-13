@@ -92,7 +92,26 @@ def setup():
 
 	plt.show()
 
-def q2():
+def q2(R = Rx):
+	#get iterations of pi/60
+	iters = np.linspace(0, 2*np.pi, 120)
+
+	for theta in iters:
+		#Print the output for R(q)
+		print('base case')
+		print(R(theta))
+
+		#print the output for R(-q)
+		print('negative theta case')
+		print(R(theta * -1))
+
+		#print the output for R(q)^T
+		print('transpose case')
+		print(R(theta).T)
+
+		#print the output for R(q)^-1
+		print('inverse case')
+		print(np.linalg.inv(R(theta)))
 
 
 def q3():
@@ -136,6 +155,9 @@ if __name__ == "__main__":
 	if len(sys.argv) > 1:
 		if int(sys.argv[1]) == 1:
 			setup()
+
+		if int(sys.argv[1]) == 2:
+			q2()
 
 		if int(sys.argv[1]) == 3:
 			q3()
