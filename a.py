@@ -44,14 +44,14 @@ def Py():
 										[0, -1, 0],
 										[0, 0, 1]])
 
-def setup():
+def q1():
 	fig = plt.figure()
 
 	#set figure and axes parameters
 	ax = fig.gca(projection='3d')
-	ax.set_xlim([-0.02, 0.02])
-	ax.set_ylim([-0.02, 0.02])
-	ax.set_zlim([-0.02, 0.02])
+	ax.set_xlim([-2, 2])
+	ax.set_ylim([-2, 2])
+	ax.set_zlim([-2, 2])
 	ax.set_xlabel('x-axis')
 	ax.set_ylabel('y-axis')
 	ax.set_zlabel('z-axis')
@@ -60,7 +60,7 @@ def setup():
 	origin = (0,0,0)
 
 	#define the original cordinates as a set of vectors normal to the xy, yz and xz planes
-	O_norm = np.array([[0.01,0,0],[0,0.01,0],[0,0,0.01]])
+	O_norm = np.array([[1,0,0],[0,1,0],[0,0,1]])
 
 	#define the components of the coordinate system
 	X,Y,Z = zip(*O_norm)
@@ -154,7 +154,7 @@ if __name__ == "__main__":
 	#pass 1 as an argument to do the setup/ question 1
 	if len(sys.argv) > 1:
 		if int(sys.argv[1]) == 1:
-			setup()
+			q1()
 
 		if int(sys.argv[1]) == 2:
 			q2()
@@ -163,6 +163,6 @@ if __name__ == "__main__":
 			q3()
 
 	else:
-		setup()
+		q1()
 
 	
