@@ -1,0 +1,7 @@
+QWidget {
+	background-color: #FFFFFF;
+}
+
+QComboBox{
+	max-width: 250px;
+}
