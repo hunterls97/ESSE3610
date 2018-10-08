@@ -49,13 +49,13 @@ class CoordinateTransformer(QWidget):
 			print(self.transformer.getPath(f, t))
 
 		def latChange(latitude):
-			self.latitude = latitude
+			self.latitude = latitude * (np.pi / 180) 
 
 		def lonChange(longitude, direction):
 			if direction == 'West':
-				self.longitude = (360 - longitude % 360)
+				self.longitude = ((360 - longitude) % 360) * (np.pi / 180) 
 			else:
-				self.longitude = longitude % 360
+				self.longitude = (longitude % 360) * (np.pi / 180)
 
 		def xChange(x):
 			self.x = x
@@ -66,13 +66,22 @@ class CoordinateTransformer(QWidget):
 		def zChange(z):
 			self.z = z
 
+		#this will be very confusing to read lol
 		def calculate(f, t):
 			paths = self.transformer.getPath(f, t)
 
 			for i, p in enumerate(paths):
 				if i > 0:
-					for op in self.systems[p][0](self.x, self.y, self.z):
-						print(self.systems[p][0](self.x, self.y, self.z)[op])
+					prev = paths[i - 1]
+					I = np.matrix([[1,0,0],
+												[0,1,0],
+												[0,0,1]])
+
+					for op in self.systems[p][0](self.x, self.y, self.z)[prev]:
+						I = np.dot(I, op)
+
+						print(I)
+					
 
 		self.sbfLabel = QLabel(self)
 		self.sbfLabel.setText('Select From Transformation: ')
@@ -276,6 +285,12 @@ class CoordinateTransformer(QWidget):
 											[-s, c, 0],
 											[0, 0, 1]])
 
+	#define a function to get the current transformation coordinates as a column matrix (vector)
+	def xyz(self):
+		return np.matrix([[self.x],
+										 [self.y],
+										 [self.z]])
+
 	def LASetup(self, x, y, z):
 		v = np.arcsin(z)
 		A = y/(x + np.sqrt((x**2) + (y**2)))
@@ -283,8 +298,9 @@ class CoordinateTransformer(QWidget):
 		return 'LASetup'
 
 	def ITSetup(self, x, y, z):
+		print(self.latitude)
 		return {
-			'Local Astronomical': [self.Rz(np.pi - self.longitude), self.Ry((np.pi / 2) - self.latitude)],
+			'Local Astronomical': [self.Rz(np.pi - self.longitude), self.Ry((np.pi / 2) - self.latitude), self.xyz()],
 			'Apparent Place': [],
 			'Conventional Terrestrial': []
 		}
