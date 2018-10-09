@@ -1,6 +1,7 @@
 import sys
 import numpy as np 
 
+from ui import ui
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -9,9 +10,11 @@ class CoordinateTransformer(QWidget):
 	def __init__(self):
 		super().__init__()
 
+		print(self.JD(2018, 10, 8))
+
 		self.setGeometry(100, 100, 800, 800)
 
-		with open('./styles.css', 'r') as styles:
+		with open('./ui/styles.css', 'r') as styles:
 			self.setStyleSheet(styles.read())
 
 		'''
@@ -24,10 +27,10 @@ class CoordinateTransformer(QWidget):
 			'Instantaneous Terrestrial': (self.ITSetup, ['Local Astronomical', 'Apparent Place', 'Conventional Terrestrial']),
 			'Apparent Place': (self.APSetup, ['Instantaneous Terrestrial', 'True Right Ascension']),
 			'Conventional Terrestrial': (self.CTSetup, ['Instantaneous Terrestrial']),
-			'True Right Ascension': (self.TRASetup, ['Apparent Place', 'Mean Right Ascension']),
-			'Mean Right Ascension (T)': (self.MRASetup, ['True Right Ascension', 'Mean Right Ascension (T0)']),
-			'Mean Right Ascension (T0)': (self.MRA0Setup, ['Mean Right Ascension (T)', 'Ecliptic']),
-			'Ecliptic': (self.ESetup, ['Mean Right Ascension (T0)'])
+			'True Right Ascension': (self.TRASetup, ['Apparent Place', 'Mean Right Ascension (T)']),
+			'Mean Right Ascension (T)': (self.MRASetup, ['True Right Ascension', 'Ecliptic']),
+			#'Mean Right Ascension (T0)': (self.MRA0Setup, ['Mean Right Ascension (T)', 'Ecliptic']),
+			'Ecliptic': (self.ESetup, ['Mean Right Ascension (T)'])
 		}
 
 		self.longitude = 0
@@ -35,156 +38,19 @@ class CoordinateTransformer(QWidget):
 		self.x = 0
 		self.y = 0
 		self.z = 0
+		self.x0 = 0
+		self.y0 = 0
+		self.z0 = 0
+		self.julianDay0 = 0
+		self.year = 0
+		self.month = 0
+		self.day = 0
+		self.hour = 0
+		self.minutes = 0
+		self.seconds = 0
 
 		self.transformer = self.TransformGraph(self.systems)
-		self.initUI()
-
-	def initUI(self):
-
-		#ui events
-		def sbfChange(f, t):
-			print(self.transformer.getPath(f, t))
-
-		def sbtChange(f, t):
-			print(self.transformer.getPath(f, t))
-
-		def latChange(latitude):
-			self.latitude = latitude * (np.pi / 180) 
-
-		def lonChange(longitude, direction):
-			if direction == 'West':
-				self.longitude = ((360 - longitude) % 360) * (np.pi / 180) 
-			else:
-				self.longitude = (longitude % 360) * (np.pi / 180)
-
-		def xChange(x):
-			self.x = x
-
-		def yChange(y):
-			self.y = y
-
-		def zChange(z):
-			self.z = z
-
-		#this will be very confusing to read lol
-		def calculate(f, t):
-			paths = self.transformer.getPath(f, t)
-
-			for i, p in enumerate(paths):
-				if i > 0:
-					prev = paths[i - 1]
-					I = np.matrix([[1,0,0],
-												[0,1,0],
-												[0,0,1]])
-
-					for op in self.systems[p][0](self.x, self.y, self.z)[prev]:
-						I = np.dot(I, op)
-
-						print(I)
-					
-
-		self.sbfLabel = QLabel(self)
-		self.sbfLabel.setText('Select From Transformation: ')
-		self.sbfLabel.move(10, 10)
-
-		self.systemsBoxFrom = QComboBox(self)
-		self.systemsBoxFrom.setObjectName('sbf')
-		self.systemsBoxFrom.addItems(list(self.systems.keys()))
-		self.systemsBoxFrom.move(190, 10)
-		
-		self.sbtLabel = QLabel(self)
-		self.sbtLabel.setText('Select To Transformation: ')
-		self.sbtLabel.move(410, 10)
-
-		self.systemsBoxTo = QComboBox(self)
-		self.systemsBoxTo.setObjectName('sbt')
-		self.systemsBoxTo.addItems(list(self.systems.keys()))
-		self.systemsBoxTo.move(580, 10)
-
-		self.longLabel = QLabel(self)
-		self.longLabel.setText('longitude (degrees): ')
-		self.longLabel.move(180, 50)
-
-		self.longitudeEditor = QLineEdit(self)
-		self.longitudeEditor.setValidator(QDoubleValidator(0,360,2))
-		self.longitudeEditor.move(180, 80)
-
-		self.longDirection = QComboBox(self)
-		self.longDirection.addItems(['West', 'East'])
-		self.longDirection.move(330, 80)
-
-		self.latLabel = QLabel(self)
-		self.latLabel.setText('latitude (degrees): ')
-		self.latLabel.move(10, 50)
-
-		self.latitudeEditor = QLineEdit(self)
-		self.latitudeEditor.setValidator(QDoubleValidator(-90, 90, 2))
-		self.latitudeEditor.move(10, 80)
-
-		self.calculate = QPushButton(self)
-		self.calculate.setText('Calculate')
-		self.calculate.move(650, 80)
-
-		self.xInLabel = QLabel(self)
-		self.xInLabel.setText('Enter X Coordinate: ')
-		self.xInLabel.move(10, 120)
-
-		self.xIn = QLineEdit(self)
-		self.xIn.setValidator(QDoubleValidator(0,360,2))
-		self.xIn.move(10, 150)
-
-		self.yInLabel = QLabel(self)
-		self.yInLabel.setText('Enter Y Coordinate: ')
-		self.yInLabel.move(10, 190)
-
-		self.yIn = QLineEdit(self)
-		self.yIn.setValidator(QDoubleValidator(0,360,2))
-		self.yIn.move(10, 220)
-
-		self.zInLabel = QLabel(self)
-		self.zInLabel.setText('Enter Z Coordinate: ')
-		self.zInLabel.move(10, 260)
-
-		self.zIn = QLineEdit(self)
-		self.zIn.setValidator(QDoubleValidator(0,360,2))
-		self.zIn.move(10, 290)
-
-		self.xOutLabel = QLabel(self)
-		self.xOutLabel.setText('Transformed X: ')
-		self.xOutLabel.move(650, 120)
-
-		self.xOut = QLineEdit(self)
-		self.xOut.setValidator(QDoubleValidator(0,360,2))
-		self.xOut.setReadOnly(True)
-		self.xOut.move(650, 150)
-
-		self.yOutLabel = QLabel(self)
-		self.yOutLabel.setText('Transformed Y: ')
-		self.yOutLabel.move(650, 190)
-
-		self.yOut = QLineEdit(self)
-		self.yOut.setValidator(QDoubleValidator(0,360,2))
-		self.yOut.setReadOnly(True)
-		self.yOut.move(650, 220)
-
-		self.zOutLabel = QLabel(self)
-		self.zOutLabel.setText('Transformed Z: ')
-		self.zOutLabel.move(650, 260)
-
-		self.zOut = QLineEdit(self)
-		self.zOut.setValidator(QDoubleValidator(0,360,2))
-		self.zOut.setReadOnly(True)
-		self.zOut.move(650, 290)
-
-		self.systemsBoxFrom.activated.connect(lambda: sbfChange(self.systemsBoxFrom.currentText(), self.systemsBoxTo.currentText()))
-		self.systemsBoxTo.activated.connect(lambda: sbfChange(self.systemsBoxFrom.currentText(), self.systemsBoxTo.currentText()))
-		self.longitudeEditor.textChanged.connect(lambda: lonChange(float(self.longitudeEditor.text() if self.longitudeEditor.text() else 0), self.longDirection.currentText()))
-		self.latitudeEditor.textChanged.connect(lambda: latChange(float(self.latitudeEditor.text() if self.latitudeEditor.text() else 0)))
-		self.longDirection.activated.connect(lambda: lonChange(float(self.longitudeEditor.text() if self.longitudeEditor.text() else 0), self.longDirection.currentText()))
-		self.xIn.textChanged.connect(lambda: xChange(float(self.xIn.text())))
-		self.yIn.textChanged.connect(lambda: yChange(float(self.yIn.text())))
-		self.zIn.textChanged.connect(lambda: zChange(float(self.zIn.text())))
-		self.calculate.clicked.connect(lambda: calculate(self.systemsBoxFrom.currentText(), self.systemsBoxTo.currentText()))
+		ui.initUI(self)
 
 	class TransformGraph(object):
 
@@ -242,18 +108,54 @@ class CoordinateTransformer(QWidget):
 
 			return None
 
+	#julian day calculator (given by TA) modified to allow hour/minute/second precision
+	#using a formula that is gives values closer to online ones (I found that most online calculators
+	#read a value given by this formula instead of the on given by the TA) 
+	def JD(self, year: int, month: int, day: int, hour: int = 0, minute: int = 0, second: int = 0):
+		#A = int(year/100)
+		#B = int(A/4)
+		#C = 2 - A + B
+		#E = 365.25 * (year + 4716)
+		#F = 30.6001 * (month + 1)
+		#JD = C + day + E + F - 1524.5
 
-		def __str__(self):
-			res = "vertices: "
+		A = int((14 - month)/12)
+		Y = year + 4800 - A
+		M = month + (12*A) - 3
 
-			for k in self.graph:
-				res += str(k) + " "
-				res += "\nedges: "
+		JD = day + int((153*M+2)/5) + Y*365 + int(Y/4) - int(Y/100) + int(Y/400) - 32045.5
+		JD = JD + (hour / 24) + (minute / (24 * 60)) + (second / (24 * 60 * 60))
 
-			for edge in self.generateEdges():
-				res += str(edge) + " "
+		return JD
 
-			return res
+	def generateParameters(self):
+		D = self.julianDay0 - 2451545 #Julian day (without hour/min/sec)
+		H = self.hour #current hour
+		T = D / 36525 
+
+		#greenwhich mean sidereal time
+		GMST = 6.697374558 + (0.06570982441908*D) + (1.00273790935*H) + (0.000026*(T**2))
+
+		O = 125.04 - (0.052954 * D) * (np.pi / 180) #mean longitude of ascending node of moon
+		L = 280.47 + (0.98565 * D) * (np.pi / 180)  #mean longitude of sun
+		E = 23.4393 - (0.0000004 * D) * (np.pi / 180) #obliquity
+
+		self.de = 0.0026*np.cos((125 - (0.0529 * D)) * (np.pi / 180)) + 0.0002*np.cos((200.9 + 1.97129*D) * (np.pi/180)) #nutation in obliquity
+		self.dw = (-0.000319*np.sin(O) - 0.000024*np.sin(2*L)) * (np.pi / 180) #nutation in longitude (in radians)
+
+		eqeq = (1/15) * (self.dw * np.cos(E) + (0.00264/60)*np.sin(O) + (0.000063/60)*np.sin(2*O)) #equation of equinoxes (from text)
+
+		self.GAST = GMST + eqeq #greenwhich apparent sidereal time
+
+		#aberration
+		#max is 20 arcminutes
+		maxA = 20/60 * (np.pi / 180) #radians
+		self.abberationCorrection = maxA * np.cos((np.pi / 6) * self.month) #abberation correction depending on month
+
+		#parallax
+		maxP = 0.8/60 * (np.pi / 180) #radians
+		self.parallaxCorrection = maxP * np.cos((np.pi / 6) * self.month) #parallax correction depending on month
+
 
 	#define a function to get a rotation matrix about the x-axis
 	def Rx(self, theta):
@@ -291,37 +193,55 @@ class CoordinateTransformer(QWidget):
 										 [self.y],
 										 [self.z]])
 
-	def LASetup(self, x, y, z):
-		v = np.arcsin(z)
-		A = y/(x + np.sqrt((x**2) + (y**2)))
-
-		return 'LASetup'
-
-	def ITSetup(self, x, y, z):
-		print(self.latitude)
+	def LASetup(self):
 		return {
-			'Local Astronomical': [self.Rz(np.pi - self.longitude), self.Ry((np.pi / 2) - self.latitude), self.xyz()],
-			'Apparent Place': [],
-			'Conventional Terrestrial': []
+			'Instantaneous Terrestrial': [np.linalg.inv(self.ry(np.pi / 2) - self.latitude), np.linalg.inv(self.Rz(np.pi - self.longitude)), self.xyz()]
 		}
 
-	def APSetup(self, x, y, z):
-		return 'APSetup'
+	def ITSetup(self):
+		return {
+			'Local Astronomical': [self.Rz(np.pi - self.longitude), self.Ry((np.pi / 2) - self.latitude), self.xyz()],
+			'Apparent Place': [np.linalg.inv(self.Rz(-self.GAST)), self.xyz()],
+			'Conventional Terrestrial': [self.Rx(self.y), self.Ry(self.x), self.xyz()]
+		}
 
-	def CTSetup(self, x, y, z):
-		return 'CTSetup'
+	#gast equation based on http://aa.usno.navy.mil/faq/docs/GAST.php
+	def APSetup(self):
+		return {
+			'Instantaneous Terrestrial': [self.Rz(-self.GAST), self.xyz()],
+			'True Right Ascension': [self.Rx(self.abberationCorrection + self.parallaxCorrection), self.xyz()]
+		}
 
-	def TRASetup(self, x, y, z):
-		return 'TRASetup'
+	def CTSetup(self):
+		return {
+			'Instantaneous Terrestrial': [np.linalg.inv(self.Ry(self.x)), np.linalg.inv(self.Rx(self.y)), self.xyz()]
+		}
 
-	def MRASetup(self, x, y, z):
-		return 'MRASetup'
+	def TRASetup(self):
+		return {
+			'Apparent Place': [np.linalg.inv(self.Rx(self.abberationCorrection + self.parallaxCorrection)), self.xyz()],
 
-	def MRA0Setup(self, x, y, z):
-		return 'MRA0Setup'
+			#where 23.4*np.pi/180 is the inclination of the ecliptic in radians, de is the nutation of the obliquity, and dw is the nutation of the longitude
+			'Mean Right Ascension (T)': [self.Rx(-(23.4 * np.pi/180) - self.de), self.Rz(self.dw), self.Rx((23.4 * np.pi/180)), self.xyz()]
+		}
 
-	def ESetup(self, x, y, z):
-		return 'ESetup'
+	def MRASetup(self):
+		return {
+			'True Right Ascension': [np.linalg.inv(self.Rx((23.4 * np.pi/180))), np.linalg.inv(self.Rz(self.dw)), np.linalg.inv(self.Rx(-(23.4 * np.pi/180) - self.de)), self.xyz()],
+			#'Mean Right Ascension(T0)': [],
+			'Ecliptic': [self.Rx(23.4 * np.pi/180), self.xyz()]
+		}
+
+	'''def MRA0Setup(self):
+		return {
+			'Mean Right Ascension(T)': [],
+			'Ecliptic': []
+		}'''
+
+	def ESetup(self):
+		return {
+			'Mean Right Ascension (T)': [np.linalg.inv(self.Rx(23.4 * np.pi/180)), self.xyz()]
+		}
 
 if __name__ == "__main__":
 	print('ESSE3610 Lab Group 6 - Part A')

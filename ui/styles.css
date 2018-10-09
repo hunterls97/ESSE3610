@@ -5,3 +5,7 @@ QWidget {
 QComboBox{
 	max-width: 250px;
 }
+
+QLineEdit[type=time]{
+	max-width: 100px;
+}
