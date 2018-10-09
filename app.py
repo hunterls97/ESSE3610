@@ -10,10 +10,10 @@ class CoordinateTransformer(QWidget):
 	def __init__(self):
 		super().__init__()
 
-		print(self.JD(2018, 10, 8))
-
+		#set the ui window parameters
 		self.setGeometry(100, 100, 800, 800)
 
+		#load basic styles
 		with open('./ui/styles.css', 'r') as styles:
 			self.setStyleSheet(styles.read())
 
@@ -33,6 +33,7 @@ class CoordinateTransformer(QWidget):
 			'Ecliptic': (self.ESetup, ['Mean Right Ascension (T)'])
 		}
 
+		#initialize variables
 		self.longitude = 0
 		self.latitude = 0
 		self.x = 0
@@ -49,24 +50,33 @@ class CoordinateTransformer(QWidget):
 		self.minutes = 0
 		self.seconds = 0
 
+		#define the transform graph based on the dictionary of systems
 		self.transformer = self.TransformGraph(self.systems)
+
+		#initialize the ui component
 		ui.initUI(self)
 
+	#basic graph data structure to allow easy path finding for coordinate transformations
 	class TransformGraph(object):
 
+		#set the graph to the descriptive dictionary
 		def __init__(self, description: dict):
 			self.graph = description
 
+		#get the verticies (unused)
 		def verticies(self):
 			return list(self.graph.keys())
 
+		#add a vertex
 		def addVertex(self, vertex):
 			if not vertex in self.graph:
 				self.graph[vertex] = []
 
+		#get the edges (unused)
 		def edges(self):
 			return self.generateEdges()
 
+		#add an edge (each edge is a coordinate transformation)
 		def addEdge(self, edge):
 			edge = set(edge)
 			(v1, v2) = tuple(edge)
@@ -76,6 +86,7 @@ class CoordinateTransformer(QWidget):
 			else:
 				self.graph[v1][1] = [v2]
 
+		#gets the edges (unused)
 		def generateEdges(self):
 			edges = []
 
@@ -86,6 +97,7 @@ class CoordinateTransformer(QWidget):
 
 			return edges
 
+		#finds the optimal (in our case only) path between coordinate systems
 		def getPath(self, start, end, path=None):
 			if path == None:
 				path = []
@@ -128,6 +140,8 @@ class CoordinateTransformer(QWidget):
 
 		return JD
 
+	#simple function to generate parameters that are used commonly by the coordinate
+	#transformation functions (formulae found from slides, text, and web)
 	def generateParameters(self):
 		D = self.julianDay0 - 2451545 #Julian day (without hour/min/sec)
 		H = self.hour #current hour
@@ -193,6 +207,12 @@ class CoordinateTransformer(QWidget):
 										 [self.y],
 										 [self.z]])
 
+	#The following setup functions describe the order in which to do operations
+	#to get to a certain coordinate system from another coordinate system.
+	#example: to get to the local astronomical coordinate system from the instantaneous
+	#terrestrial coordinate system, we take R2^-1(pi/2 - lattitude) * R3^-1((pi - longitude)) * {XYZ}
+	#Notice that by multiplying the rotations by their respective inverses, we obtain the transformations
+	#required to get the Instantaneous Terrestrial from the Local Astronomical
 	def LASetup(self):
 		return {
 			'Instantaneous Terrestrial': [np.linalg.inv(self.ry(np.pi / 2) - self.latitude), np.linalg.inv(self.Rz(np.pi - self.longitude)), self.xyz()]
@@ -244,7 +264,7 @@ class CoordinateTransformer(QWidget):
 		}
 
 if __name__ == "__main__":
-	print('ESSE3610 Lab Group 6 - Part A')
+	print('ESSE3610 Lab Group 6 - Part C')
 
 	app = QApplication(sys.argv)
 	Coords = CoordinateTransformer()
