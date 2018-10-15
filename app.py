@@ -202,7 +202,7 @@ class CoordinateTransformer(QWidget):
 											[0, 0, 1]])
 
 	#define a function to get the reflection about the y-axis
-	def Py():
+	def Py(self):
 		return np.matrix([[1, 0, 0],
 											[0, -1, 0],
 											[0, 0, 1]])
