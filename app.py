@@ -201,6 +201,12 @@ class CoordinateTransformer(QWidget):
 											[-s, c, 0],
 											[0, 0, 1]])
 
+	#define a function to get the reflection about the y-axis
+	def Py():
+		return np.matrix([[1, 0, 0],
+											[0, -1, 0],
+											[0, 0, 1]])
+
 	#define a function to get the current transformation coordinates as a column matrix (vector)
 	def xyz(self):
 		return np.matrix([[self.x],
@@ -220,7 +226,7 @@ class CoordinateTransformer(QWidget):
 
 	def ITSetup(self):
 		return {
-			'Local Astronomical': [self.Rz(np.pi - self.longitude), self.Ry((np.pi / 2) - self.latitude), self.xyz()],
+			'Local Astronomical': [self.Rz(np.pi - self.longitude), self.Ry((np.pi / 2) - self.latitude), self.Py(), self.xyz()],
 			'Apparent Place': [np.linalg.inv(self.Rz(-self.GAST)), self.xyz()],
 			'Conventional Terrestrial': [self.Rx(self.y), self.Ry(self.x), self.xyz()]
 		}
