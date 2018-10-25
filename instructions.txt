@@ -1,0 +1,8 @@
+Note: this project was made with python 3.6.4
+
+to run part a or b from the command line:
+python [file.py] [number of question]
+
+to run part c from the command line:
+./coords/Scripts/activate
+python app.py

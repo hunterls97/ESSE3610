@@ -67,7 +67,7 @@ def q1():
 
 	#render the coordintes
 	coords = ax.quiver(*origin, X, Y, Z, label='rotation')
-
+   
 	#get iterations of pi/60
 	iters = np.linspace(0, 2*np.pi, 120)
 
@@ -139,9 +139,14 @@ def q3():
 	ax.quiver(*origin, X, Y, Z, label='rotation')
 
 	#Calculate the components of Ox'y'z'
-	X = np.dot(np.dot(Ry(np.pi / 2), np.dot(Rz(-1 * np.pi / 6), np.dot(Py(), Rx((np.pi * gln / 4))))), X)
-	Y = np.dot(np.dot(Ry(np.pi / 2), np.dot(Rz(-1 * np.pi / 6), np.dot(Py(), Rx((np.pi * gln / 4))))), Y)
-	Z = np.dot(np.dot(Ry(np.pi / 2), np.dot(Rz(-1 * np.pi / 6), np.dot(Py(), Rx((np.pi * gln / 4))))), Z)
+	#X = np.dot(np.dot(Ry(np.pi / 2), np.dot(Rz(-1 * np.pi / 6), np.dot(Py(), Rx((np.pi * gln / 4))))), X)
+	#Y = np.dot(np.dot(Ry(np.pi / 2), np.dot(Rz(-1 * np.pi / 6), np.dot(Py(), Rx((np.pi * gln / 4))))), Y)
+	#Z = np.dot(np.dot(Ry(np.pi / 2), np.dot(Rz(-1 * np.pi / 6), np.dot(Py(), Rx((np.pi * gln / 4))))), Z)
+
+	X = np.dot(np.dot(Rx((np.pi * gln / 4)), np.dot(Py(), np.dot(Rz(-1 * np.pi / 6), Ry(np.pi / 2)))), X)
+	Y = np.dot(np.dot(Rx((np.pi * gln / 4)), np.dot(Py(), np.dot(Rz(-1 * np.pi / 6), Ry(np.pi / 2)))), Y)
+	Z = np.dot(np.dot(Rx((np.pi * gln / 4)), np.dot(Py(), np.dot(Rz(-1 * np.pi / 6), Ry(np.pi / 2)))), Z)
+
 
 	#Render the transformation
 	ax.quiver(*origin, X, Y, Z, label='rotation', color='black')
@@ -164,5 +169,3 @@ if __name__ == "__main__":
 
 	else:
 		q1()
-
-	

@@ -163,16 +163,19 @@ class CoordinateTransformer(QWidget):
 
 		#aberration
 		#max is 20 arcseconds
-		maxA = 20/3600 * (np.pi / 180) #radians
+		maxA = (1.939*10**(-4)) / np.sqrt(2) #radians
 		self.aberrationCorrection = maxA * (np.cos(((np.pi / 6) * self.month) + (np.pi / 3)) + np.sin(((np.pi / 6) * self.month) + (np.pi / 3))) #abberation correction depending on month
 
 		#parallax
-		maxP = 0.8/3600 * (np.pi / 180) #radians
+		maxP = (7.757*10**(-6)) / np.sqrt(2) #radians
 		self.parallaxCorrection = maxP * (np.cos(((np.pi / 6) * self.month) + (np.pi / 3)) + np.sin(((np.pi / 6) * self.month) + (np.pi / 3))) #parallax correction depending on month
 
+		#years since 1900
+		B1900 = self.year + (self.month / 12) - 1900 
+
 		#polar motion
-		self.xp = 0.001535
-		self.yp = xp
+		self.xp = (0.04188/np.sqrt(2))*np.cos((2*np.pi*B1900)/41040)
+		self.yp = (-1)*(0.04188/np.sqrt(2))*np.sin((2*np.pi*B1900)/41040)
 
 
 	#define a function to get a rotation matrix about the x-axis
@@ -225,7 +228,7 @@ class CoordinateTransformer(QWidget):
 	#required to get the Instantaneous Terrestrial from the Local Astronomical
 	def LASetup(self):
 		return {
-			'Instantaneous Terrestrial': [np.linalg.inv(self.Py()), np.linalg.inv(self.ry(np.pi / 2) - self.latitude), np.linalg.inv(self.Rz(np.pi - self.longitude)), self.xyz()]
+			'Instantaneous Terrestrial': [np.linalg.inv(self.Py()), np.linalg.inv(self.Ry((np.pi / 2) - self.latitude)), np.linalg.inv(self.Rz(np.pi - self.longitude)), self.xyz()]
 		}
 
 	def ITSetup(self):

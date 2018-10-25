@@ -8,16 +8,6 @@ import sys
 #Group Lab Number
 gln = 6
 
-def julian(year: int, month: int, day: int):
-	#A = year/100
-	#B = A/4
-	#C = 2 - A + B
-	#E = 365.25 * (year + 4716)
-	#F = 30.6001 * (month + 1)
-	#JD = C + day + E + F - 1524.5
-
-	return None
-
 def q1():
 	#Since every andle is measured east and 280.185 is east, we converted it to a west angle (negative east direction)
 	L = (360 - 280.185) #degrees west
