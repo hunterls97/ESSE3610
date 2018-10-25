@@ -162,13 +162,17 @@ class CoordinateTransformer(QWidget):
 		self.GAST = GMST + eqeq #greenwhich apparent sidereal time
 
 		#aberration
-		#max is 20 arcminutes
-		maxA = 20/60 * (np.pi / 180) #radians
-		self.abberationCorrection = maxA * np.cos((np.pi / 6) * self.month) #abberation correction depending on month
+		#max is 20 arcseconds
+		maxA = 20/3600 * (np.pi / 180) #radians
+		self.aberrationCorrection = maxA * (np.cos(((np.pi / 6) * self.month) + (np.pi / 3)) + np.sin(((np.pi / 6) * self.month) + (np.pi / 3))) #abberation correction depending on month
 
 		#parallax
-		maxP = 0.8/60 * (np.pi / 180) #radians
-		self.parallaxCorrection = maxP * np.cos((np.pi / 6) * self.month) #parallax correction depending on month
+		maxP = 0.8/3600 * (np.pi / 180) #radians
+		self.parallaxCorrection = maxP * (np.cos(((np.pi / 6) * self.month) + (np.pi / 3)) + np.sin(((np.pi / 6) * self.month) + (np.pi / 3))) #parallax correction depending on month
+
+		#polar motion
+		self.xp = 0.001535
+		self.yp = xp
 
 
 	#define a function to get a rotation matrix about the x-axis
@@ -221,31 +225,31 @@ class CoordinateTransformer(QWidget):
 	#required to get the Instantaneous Terrestrial from the Local Astronomical
 	def LASetup(self):
 		return {
-			'Instantaneous Terrestrial': [np.linalg.inv(self.ry(np.pi / 2) - self.latitude), np.linalg.inv(self.Rz(np.pi - self.longitude)), self.xyz()]
+			'Instantaneous Terrestrial': [np.linalg.inv(self.Py()), np.linalg.inv(self.ry(np.pi / 2) - self.latitude), np.linalg.inv(self.Rz(np.pi - self.longitude)), self.xyz()]
 		}
 
 	def ITSetup(self):
 		return {
 			'Local Astronomical': [self.Rz(np.pi - self.longitude), self.Ry((np.pi / 2) - self.latitude), self.Py(), self.xyz()],
 			'Apparent Place': [np.linalg.inv(self.Rz(-self.GAST)), self.xyz()],
-			'Conventional Terrestrial': [self.Rx(self.y), self.Ry(self.x), self.xyz()]
+			'Conventional Terrestrial': [self.Rx(self.yp), self.Ry(self.xp), self.xyz()]
 		}
 
 	#gast equation based on http://aa.usno.navy.mil/faq/docs/GAST.php
 	def APSetup(self):
 		return {
 			'Instantaneous Terrestrial': [self.Rz(-self.GAST), self.xyz()],
-			'True Right Ascension': [self.Rx(self.abberationCorrection + self.parallaxCorrection), self.xyz()]
+			'True Right Ascension': [self.Rx(self.aberrationCorrection + self.parallaxCorrection), self.xyz()]
 		}
 
 	def CTSetup(self):
 		return {
-			'Instantaneous Terrestrial': [np.linalg.inv(self.Ry(self.x)), np.linalg.inv(self.Rx(self.y)), self.xyz()]
+			'Instantaneous Terrestrial': [np.linalg.inv(self.Ry(self.xp)), np.linalg.inv(self.Rx(self.yp)), self.xyz()]
 		}
 
 	def TRASetup(self):
 		return {
-			'Apparent Place': [np.linalg.inv(self.Rx(self.abberationCorrection + self.parallaxCorrection)), self.xyz()],
+			'Apparent Place': [np.linalg.inv(self.Rx(self.aberrationCorrection + self.parallaxCorrection)), self.xyz()],
 
 			#where 23.4*np.pi/180 is the inclination of the ecliptic in radians, de is the nutation of the obliquity, and dw is the nutation of the longitude
 			'Mean Right Ascension (T)': [self.Rx(-(23.4 * np.pi/180) - self.de), self.Rz(self.dw), self.Rx((23.4 * np.pi/180)), self.xyz()]

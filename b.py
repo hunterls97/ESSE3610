@@ -32,7 +32,7 @@ def q1():
 
 	#values for the hour angle (to be interpolated)
 	H_1 = GAST_1 + RA_1 - L
-	H_2 = GAST_2 + RA_2 - L
+	H_2 = GAST_2 + RA_2 - L  
 
 	#quantity of iterations
 	iters = 500

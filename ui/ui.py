@@ -50,8 +50,27 @@ def initUI(self):
 	def zChange(z):
 		self.z0 = z
 
+	def setVals():
+		sbfChange(self.systemsBoxFrom.currentText(), self.systemsBoxTo.currentText())
+		sbfChange(self.systemsBoxFrom.currentText(), self.systemsBoxTo.currentText())
+		lonChange(float(self.longitudeEditor.text() if self.longitudeEditor.text() else 0), self.longDirection.currentText())
+		latChange(float(self.latitudeEditor.text() if self.latitudeEditor.text() else 0))
+		lonChange(float(self.longitudeEditor.text() if self.longitudeEditor.text() else 0), self.longDirection.currentText())
+		xChange(float(self.xIn.text() if self.xIn.text() else 0))
+		yChange(float(self.yIn.text() if self.yIn.text() else 0))
+		zChange(float(self.zIn.text() if self.zIn.text() else 0))
+		timeChange(self.yearIn.text(), self.monthIn.text(), self.dayIn.text(), self.hourIn.text(), self.minuteIn.text(), self.secondIn.text())
+		timeChange(self.yearIn.text(), self.monthIn.text(), self.dayIn.text(), self.hourIn.text(), self.minuteIn.text(), self.secondIn.text())
+		timeChange(self.yearIn.text(), self.monthIn.text(), self.dayIn.text(), self.hourIn.text(), self.minuteIn.text(), self.secondIn.text())
+		timeChange(self.yearIn.text(), self.monthIn.text(), self.dayIn.text(), self.hourIn.text(), self.minuteIn.text(), self.secondIn.text())
+		timeChange(self.yearIn.text(), self.monthIn.text(), self.dayIn.text(), self.hourIn.text(), self.minuteIn.text(), self.secondIn.text())
+		timeChange(self.yearIn.text(), self.monthIn.text(), self.dayIn.text(), self.hourIn.text(), self.minuteIn.text(), self.secondIn.text())
+
+
 	#this will be very confusing to read lol
 	def calculate(f, t):
+		setVals()
+
 		paths = self.transformer.getPath(f, t)
 
 		self.x = self.x0
@@ -157,7 +176,7 @@ def initUI(self):
 	self.longLabel.move(180, 120)
 
 	self.longitudeEditor = QLineEdit(self)
-	self.longitudeEditor.setValidator(QDoubleValidator(0,360,2))
+	self.longitudeEditor.setValidator(QDoubleValidator(0,360,6))
 	self.longitudeEditor.move(180, 150)
 
 	self.longDirection = QComboBox(self)
@@ -169,7 +188,7 @@ def initUI(self):
 	self.latLabel.move(10, 120)
 
 	self.latitudeEditor = QLineEdit(self)
-	self.latitudeEditor.setValidator(QDoubleValidator(-90, 90, 2))
+	self.latitudeEditor.setValidator(QDoubleValidator(-90, 90, 6))
 	self.latitudeEditor.move(10, 150)
 
 	self.calculate = QPushButton(self)
@@ -181,7 +200,7 @@ def initUI(self):
 	self.xInLabel.move(10, 190)
 
 	self.xIn = QLineEdit(self)
-	self.xIn.setValidator(QDoubleValidator(0,360,2))
+	self.xIn.setValidator(QDoubleValidator(-999999, 999999,6))
 	self.xIn.move(10, 220)
 
 	self.yInLabel = QLabel(self)
@@ -189,7 +208,7 @@ def initUI(self):
 	self.yInLabel.move(10, 260)
 
 	self.yIn = QLineEdit(self)
-	self.yIn.setValidator(QDoubleValidator(0,360,2))
+	self.yIn.setValidator(QDoubleValidator(-999999,999999,6))
 	self.yIn.move(10, 290)
 
 	self.zInLabel = QLabel(self)
@@ -197,7 +216,7 @@ def initUI(self):
 	self.zInLabel.move(10, 340)
 
 	self.zIn = QLineEdit(self)
-	self.zIn.setValidator(QDoubleValidator(0,360,2))
+	self.zIn.setValidator(QDoubleValidator(-999999,999999,6))
 	self.zIn.move(10, 360)
 
 	self.xOutLabel = QLabel(self)
@@ -205,7 +224,7 @@ def initUI(self):
 	self.xOutLabel.move(650, 190)
 
 	self.xOut = QLineEdit(self)
-	self.xOut.setValidator(QDoubleValidator(0,360,2))
+	self.xOut.setValidator(QDoubleValidator(0,360,6))
 	self.xOut.setReadOnly(True)
 	self.xOut.move(650, 220)
 
@@ -214,7 +233,7 @@ def initUI(self):
 	self.yOutLabel.move(650, 260)
 
 	self.yOut = QLineEdit(self)
-	self.yOut.setValidator(QDoubleValidator(0,360,2))
+	self.yOut.setValidator(QDoubleValidator(0,360,6))
 	self.yOut.setReadOnly(True)
 	self.yOut.move(650, 290)
 
@@ -223,22 +242,8 @@ def initUI(self):
 	self.zOutLabel.move(650, 340)
 
 	self.zOut = QLineEdit(self)
-	self.zOut.setValidator(QDoubleValidator(0,360,2))
+	self.zOut.setValidator(QDoubleValidator(0,360,6))
 	self.zOut.setReadOnly(True)
 	self.zOut.move(650, 360)
 
-	self.systemsBoxFrom.activated.connect(lambda: sbfChange(self.systemsBoxFrom.currentText(), self.systemsBoxTo.currentText()))
-	self.systemsBoxTo.activated.connect(lambda: sbfChange(self.systemsBoxFrom.currentText(), self.systemsBoxTo.currentText()))
-	self.longitudeEditor.textChanged.connect(lambda: lonChange(float(self.longitudeEditor.text() if self.longitudeEditor.text() else 0), self.longDirection.currentText()))
-	self.latitudeEditor.textChanged.connect(lambda: latChange(float(self.latitudeEditor.text() if self.latitudeEditor.text() else 0)))
-	self.longDirection.activated.connect(lambda: lonChange(float(self.longitudeEditor.text() if self.longitudeEditor.text() else 0), self.longDirection.currentText()))
-	self.xIn.textChanged.connect(lambda: xChange(float(self.xIn.text())))
-	self.yIn.textChanged.connect(lambda: yChange(float(self.yIn.text())))
-	self.zIn.textChanged.connect(lambda: zChange(float(self.zIn.text())))
 	self.calculate.clicked.connect(lambda: calculate(self.systemsBoxFrom.currentText(), self.systemsBoxTo.currentText()))
-	self.yearIn.textChanged.connect(lambda: timeChange(self.yearIn.text(), self.monthIn.text(), self.dayIn.text(), self.hourIn.text(), self.minuteIn.text(), self.secondIn.text()))
-	self.monthIn.textChanged.connect(lambda: timeChange(self.yearIn.text(), self.monthIn.text(), self.dayIn.text(), self.hourIn.text(), self.minuteIn.text(), self.secondIn.text()))
-	self.dayIn.textChanged.connect(lambda: timeChange(self.yearIn.text(), self.monthIn.text(), self.dayIn.text(), self.hourIn.text(), self.minuteIn.text(), self.secondIn.text()))
-	self.hourIn.textChanged.connect(lambda: timeChange(self.yearIn.text(), self.monthIn.text(), self.dayIn.text(), self.hourIn.text(), self.minuteIn.text(), self.secondIn.text()))
-	self.minuteIn.textChanged.connect(lambda: timeChange(self.yearIn.text(), self.monthIn.text(), self.dayIn.text(), self.hourIn.text(), self.minuteIn.text(), self.secondIn.text()))
-	self.secondIn.textChanged.connect(lambda: timeChange(self.yearIn.text(), self.monthIn.text(), self.dayIn.text(), self.hourIn.text(), self.minuteIn.text(), self.secondIn.text()))
